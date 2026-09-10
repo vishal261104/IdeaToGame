@@ -107,12 +107,40 @@ Your idea (GAME_IDEA)
 
 ---
 
+## Game Idea Suggestions
+
+Paste any of these straight into `GAME_IDEA` to get started:
+
+### 🕹️ Arcade Classics
+| Idea | `GAME_IDEA` value |
+|---|---|
+| Brick Breaker | `"A brick breaker game with a paddle, bouncing ball, and colorful bricks that break on hit. Add a score and lives system."` |
+| Snake | `"Classic snake game where the snake grows longer each time it eats food. Game over if it hits the wall or itself."` |
+| Flappy Bird | `"A flappy bird clone where a rocket ship flies through space and must dodge incoming asteroid gaps."` |
+
+### ⚔️ Action
+| Idea | `GAME_IDEA` value |
+|---|---|
+| Space Invaders | `"Space invaders where waves of aliens descend toward the player. Player has a shield that degrades when hit."` |
+| Vampire Survivors | `"Top-down survivor game where enemies swarm the player from all sides. Player auto-attacks. Collect XP gems to level up."` |
+| Dungeon Crawler | `"Top-down dungeon crawler where the player fights skeletons, collects a key, and finds the exit door."` |
+
+### 🧠 Puzzle / Casual
+| Idea | `GAME_IDEA` value |
+|---|---|
+| Tower Stack | `"Stacking game where a platform swings back and forth and the player drops blocks to build the tallest tower."` |
+| Gravity Flipper | `"A game where the player flips gravity with SPACE to navigate a character through a cave without hitting walls."` |
+| Color Flood | `"A grid puzzle where the player floods the board from the top-left corner, trying to fill it all in one color in fewest moves."` |
+
+---
+
 ## Tips
 
 - **Change the game idea** by editing `GAME_IDEA` in `generate_game.py`
 - **Generation takes 2–5 minutes** — the agents are making several LLM calls
 - If the generated game has a syntax error, re-run `generate_game.py` (LLM outputs vary slightly)
 - All games are self-contained — they only use `pygame`, `sys`, `math`, and `random`
+- **Be descriptive** — the more detail in your idea, the better the output
 
 ---
 
