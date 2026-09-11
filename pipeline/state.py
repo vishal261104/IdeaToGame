@@ -20,8 +20,11 @@ class GameState(TypedDict):
     dependencies: list      # e.g. ["pygame", "sys", "random"]
     description: str        # one-line summary of the generated game
 
-    # ── Retry / error tracking ────────────────────────────────────
+    # ── Retry / error tracking ────────────────────────────────────────────
     retries: int            # how many times Developer has been retried
     max_retries: int        # maximum allowed retries (default 3)
     syntax_error: str       # last syntax error message (if any)
     status: str             # "success" | "failed" | "retrying"
+
+    # ── Persistence (filled by save_node) ────────────────────────────────
+    run_id: str             # UUID from Supabase — used to cross-ref ChromaDB

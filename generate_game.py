@@ -24,8 +24,8 @@ sys.stderr.reconfigure(encoding="utf-8")
 # ---------------------------------------------------------------------------
 # Configuration — edit these to generate a different game
 # ---------------------------------------------------------------------------
-GAME_IDEA   = "snake evolution ,snake will grow eventually by eating rats and food"
-OUTPUT_FILE = "snake.py"
+GAME_IDEA   = "Asteroid blaster but cannons in the front like this |__|"
+OUTPUT_FILE = "spaceship3.py"
 
 # ---------------------------------------------------------------------------
 # Load .env (supports KEY=value and KEY:value formats)

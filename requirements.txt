@@ -4,8 +4,7 @@ langgraph
 pydantic
 
 chromadb
-psycopg2-binary
-sqlalchemy
+supabase
 
 langsmith
 
