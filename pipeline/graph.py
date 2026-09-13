@@ -63,25 +63,22 @@ def save_node(state: GameState) -> GameState:
       1. Saves game code to disk
       2. Logs the run to Supabase (always)
       3. Stores GDD + code in ChromaDB (only on success)
+      1. Logs the run to Supabase (always)
+      2. Stores GDD + code in ChromaDB (only on success)
     """
     output_file = state.get("output_file", "game.py")
     game_code   = state.get("game_code", "")
     status      = state.get("status", "failed")
 
-    # 1. Save code to disk
-    if game_code:
-        output_path = Path(output_file)
-        output_path.write_text(game_code, encoding="utf-8")
-        print(f"\n[Save] Code written → {output_path.resolve()}")
-
-    # 2. Log to Supabase
+    # Write to Supabase (Database)
     run_id = log_run(
         game_idea   = state.get("game_idea", ""),
         output_file = output_file,
         status      = status,
-        retries     = max(0, state.get("retries", 0) - 1),
+        retries     = state.get("retries", 0),
         description = state.get("description", ""),
         code_length = len(game_code),
+        game_code   = game_code,
     )
 
     # 3. Store in ChromaDB (only on success — don't pollute the store with broken code)

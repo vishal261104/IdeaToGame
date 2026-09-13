@@ -51,6 +51,7 @@ def log_run(
     retries: int = 0,
     description: str = "",
     code_length: int = 0,
+    game_code: str = "",
 ) -> str:
     """
     Insert a run record into the Supabase `runs` table.
@@ -73,6 +74,7 @@ def log_run(
             "retries":     retries,
             "description": description,
             "code_length": code_length,     # chars — rough token proxy
+            "game_code":   game_code,       # raw python code
             "created_at":  datetime.now(timezone.utc).isoformat(),
         }).execute()
 
@@ -120,3 +122,13 @@ def get_run_by_id(run_id: str) -> Optional[dict]:
     except Exception as exc:
         print(f"[Supabase] WARNING: Could not fetch run {run_id} — {exc}")
         return None
+
+def delete_run(run_id: str) -> bool:
+    """Delete a single run record by its UUID."""
+    try:
+        client = _get_client()
+        client.table("runs").delete().eq("id", run_id).execute()
+        return True
+    except Exception as exc:
+        print(f"[Supabase] WARNING: Could not delete run {run_id} — {exc}")
+        return False

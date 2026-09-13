@@ -64,10 +64,16 @@ def developer_node(state: GameState, llm) -> GameState:
     retry_num = state.get("retries", 0)
     print(f"\n[Developer] Writing Pygame code (attempt {retry_num + 1})...")
 
-    # On retry, include the previous error so the LLM can fix it
-    error_context = ""
+    error_context = (
+        "5. DO NOT include any system-specific paths.\n"
+        "6. Add the following at the very top of your code to suppress annoying Pygame warnings:\n"
+        "   ```python\n"
+        "   import warnings\n"
+        "   warnings.filterwarnings(\"ignore\", category=UserWarning)\n"
+        "   ```\n\n"
+    )
     if state.get("syntax_error"):
-        error_context = (
+        error_context += (
             f"IMPORTANT — your previous attempt had this syntax error:\n"
             f"{state['syntax_error']}\n"
             "Fix this specific issue in the new version.\n\n"

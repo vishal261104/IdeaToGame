@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS runs (
     retries      INTEGER     DEFAULT 0,
     description  TEXT        DEFAULT '',
     code_length  INTEGER     DEFAULT 0,  -- chars in generated code
+    game_code    TEXT,                   -- the full python code
     created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 

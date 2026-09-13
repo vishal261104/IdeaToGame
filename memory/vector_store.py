@@ -106,20 +106,29 @@ def search_similar(game_idea: str, k: int = 3) -> str:
         results = col.query(
             query_texts=[game_idea],
             n_results=min(k, col.count()),
-            include=["documents", "metadatas"],
+            include=["documents", "metadatas", "distances"],
         )
 
         if not results["documents"] or not results["documents"][0]:
             return ""
 
         lines = []
-        for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
+        # Zip documents, metadata, and distance
+        for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
+            # Cosine distance: 0 is identical, > 0.6 is likely irrelevant for all-MiniLM
+            if dist > 0.6:
+                continue
+                
             lines.append(
                 f"- **{meta.get('output_file', 'unknown')}**: "
                 f"{meta.get('description', 'no description')}\n"
                 f"  Idea: {meta.get('game_idea', '')}\n"
                 f"  GDD excerpt: {doc[:300]}...\n"
             )
+
+        if not lines:
+            print("[ChromaDB] No sufficiently similar games found (all below threshold).")
+            return ""
 
         print(f"[ChromaDB] Found {len(lines)} similar game(s).")
         return "\n".join(lines)
