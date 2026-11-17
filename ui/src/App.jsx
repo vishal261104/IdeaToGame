@@ -154,12 +154,21 @@ function TermLog({ lines, status }) {
 
 /* ── Game Launch Modal ───────────────────────────────────────── */
 function GameLaunchModal({ code, filename, onClose }) {
+  const [copiedWeb, setCopiedWeb] = useState(false)
+
   const download = () => {
     const a = Object.assign(document.createElement('a'), {
       href: URL.createObjectURL(new Blob([code], { type: 'text/plain' })),
       download: filename || 'game.py',
     })
     a.click()
+  }
+
+  const openOnlineRunner = () => {
+    navigator.clipboard.writeText(code)
+    setCopiedWeb(true)
+    setTimeout(() => setCopiedWeb(false), 3000)
+    window.open('https://www.online-python.com/online_pygame_compiler', '_blank')
   }
 
   // Close on overlay click or Escape key
@@ -173,41 +182,35 @@ function GameLaunchModal({ code, filename, onClose }) {
     <div className="game-modal-overlay" onClick={onClose}>
       <div className="game-modal" onClick={e => e.stopPropagation()}>
         <div className="game-modal-hd">
-          <span className="game-modal-title">How to play your game</span>
+          <span className="game-modal-title">Play Your Game (100% Free)</span>
           <button className="drawer-close" onClick={onClose}>✕</button>
         </div>
 
         <div className="game-modal-opts">
           <div className="game-modal-opt">
-            <span className="game-modal-opt-icon">💻</span>
-            <div>
-              <div className="game-modal-opt-title">Run locally</div>
-              <div className="game-modal-opt-desc">
-                Download the file, then in your terminal run:<br />
-                <code>pip install pygame &amp;&amp; python {filename || 'game.py'}</code>
-              </div>
-            </div>
-          </div>
-
-          <div className="game-modal-opt">
-            <span className="game-modal-opt-icon">🔁</span>
-            <div>
-              <div className="game-modal-opt-title">Run on Replit</div>
-              <div className="game-modal-opt-desc">
-                Open a free Python environment online, paste your code, and click&nbsp;<strong>Run</strong>.
-                Replit supports Pygame via VNC display.
-              </div>
-            </div>
-          </div>
-
-          <div className="game-modal-opt">
             <span className="game-modal-opt-icon">🌐</span>
             <div>
-              <div className="game-modal-opt-title">Simple Pygame (Trinket)</div>
+              <div className="game-modal-opt-title">Option 1: Play in Browser (Free, No Sign-up)</div>
               <div className="game-modal-opt-desc">
-                For beginner-level Pygame scripts, try{' '}
-                <a href="https://trinket.io/pygame" target="_blank" rel="noreferrer">trinket.io/pygame</a>.
-                Paste the code and hit Run.
+                Runs Pygame via WebAssembly directly in your browser. Click below to copy your game code and open the free runner. Just paste (<kbd>Ctrl+V</kbd>) and click <strong>Run</strong>!
+                <div style={{ marginTop: '6px' }}>
+                  Alternative free runners:{' '}
+                  <a href="https://www.online-ide.com/online_pygame_editor" target="_blank" rel="noreferrer">Online-IDE</a>
+                  {' · '}
+                  <a href="https://trinket.io/pygame" target="_blank" rel="noreferrer">Trinket Pygame</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="game-modal-opt">
+            <span className="game-modal-opt-icon">💻</span>
+            <div>
+              <div className="game-modal-opt-title">Option 2: Run Locally (Best 60 FPS Performance)</div>
+              <div className="game-modal-opt-desc">
+                Download the file and run it natively on your machine:<br />
+                <code>pip install pygame</code><br />
+                <code>python {filename || 'game.py'}</code>
               </div>
             </div>
           </div>
@@ -217,14 +220,12 @@ function GameLaunchModal({ code, filename, onClose }) {
           <button className="game-modal-dl" onClick={download}>
             ⬇&nbsp; Download {filename || 'game.py'}
           </button>
-          <a
+          <button
             className="game-modal-replit"
-            href="https://replit.com/@replit/Python?v=1"
-            target="_blank"
-            rel="noreferrer"
+            onClick={openOnlineRunner}
           >
-            ▶&nbsp; Open Replit
-          </a>
+            {copiedWeb ? '✓ Code Copied! Opening Player…' : '▶ Copy & Open Free Web Player'}
+          </button>
         </div>
       </div>
     </div>
