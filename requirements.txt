@@ -14,3 +14,5 @@ uvicorn[standard]
 openai
 nest_asyncio
 pygame
+aiofiles
+python-multipart

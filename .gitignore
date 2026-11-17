@@ -11,7 +11,8 @@ __pycache__/
 .venv/
 venv/
 env/
-
+CODEBASE_EXPLAINED.md
+INTERVIEW_QUESTIONS.md
 # ── Generated game files ──────────────────────────────────────────
 # Ignore any .py files generated at the root of IdeaToGame/
 # (e.g. main.py, spaceship.py, snake.py, vampire2.py, etc.)

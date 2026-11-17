@@ -36,19 +36,19 @@ function ConfettiBurst({ trigger }) {
     canvas.height = window.innerHeight
     const ctx = canvas.getContext('2d')
 
-    const palette = ['#ffffff','#e5e5e5','#a3a3a3','#525252','#f5f5f5','#d4d4d4']
-    const pieces  = Array.from({ length: 90 }, () => {
+    const palette = ['#fafafa','#d4d4d8','#a1a1aa','#71717a','#e4e4e7','#52525b']
+    const pieces  = Array.from({ length: 80 }, () => {
       const angle = Math.random() * Math.PI * 2
-      const spd   = 4 + Math.random() * 10
+      const spd   = 3 + Math.random() * 9
       return {
-        x: canvas.width * 0.5, y: canvas.height * 0.42,
+        x: canvas.width * 0.55, y: canvas.height * 0.35,
         vx: Math.cos(angle) * spd,
-        vy: Math.sin(angle) * spd - 5,
-        r: 3 + Math.random() * 5,
+        vy: Math.sin(angle) * spd - 4,
+        r: 2 + Math.random() * 4,
         color: palette[Math.floor(Math.random() * palette.length)],
-        alpha: 1, gravity: 0.2 + Math.random() * 0.1,
-        rot: Math.random() * Math.PI, rotV: (Math.random() - 0.5) * 0.18,
-        sq: Math.random() > 0.55,
+        alpha: 1, gravity: 0.18 + Math.random() * 0.08,
+        rot: Math.random() * Math.PI, rotV: (Math.random() - 0.5) * 0.15,
+        sq: Math.random() > 0.5,
       }
     })
 
@@ -58,14 +58,14 @@ function ConfettiBurst({ trigger }) {
       let alive = 0
       for (const p of pieces) {
         p.x += p.vx; p.y += p.vy; p.vy += p.gravity
-        p.vx *= 0.993; p.alpha *= 0.973; p.r *= 0.987; p.rot += p.rotV
-        if (p.alpha < 0.02 || p.r < 0.4) continue
+        p.vx *= 0.994; p.alpha *= 0.976; p.r *= 0.99; p.rot += p.rotV
+        if (p.alpha < 0.02 || p.r < 0.3) continue
         alive++
         ctx.save()
         ctx.globalAlpha = p.alpha
         ctx.fillStyle   = p.color
         ctx.translate(p.x, p.y); ctx.rotate(p.rot)
-        if (p.sq) ctx.fillRect(-p.r, -p.r * 0.4, p.r * 2, p.r * 0.8)
+        if (p.sq) ctx.fillRect(-p.r, -p.r * 0.35, p.r * 2, p.r * 0.7)
         else { ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill() }
         ctx.restore()
       }
@@ -79,7 +79,7 @@ function ConfettiBurst({ trigger }) {
   return <canvas ref={ref} className="confetti-canvas" aria-hidden />
 }
 
-/* ── Success notification (not a toast — a terminal-style panel) */
+/* ── Success notification ────────────────────────────────────── */
 function SuccessPanel({ filename, desc, onDismiss }) {
   useEffect(() => {
     const t = setTimeout(onDismiss, 7000)
@@ -88,9 +88,7 @@ function SuccessPanel({ filename, desc, onDismiss }) {
 
   return (
     <div className="succ-panel" role="status">
-      <div className="succ-gutter">
-        <span className="succ-dot" />
-      </div>
+      <div className="succ-gutter" />
       <div className="succ-body">
         <div className="succ-title">Build complete</div>
         <div className="succ-file">{filename}</div>
@@ -104,7 +102,7 @@ function SuccessPanel({ filename, desc, onDismiss }) {
   )
 }
 
-/* ── Terminal-style progress log ─────────────────────────────── */
+/* ── Terminal log ────────────────────────────────────────────── */
 function TermLog({ lines, status }) {
   const bodyRef = useRef(null)
   useEffect(() => {
@@ -139,13 +137,13 @@ function TermLog({ lines, status }) {
         {running && <span className="term-cursor">█</span>}
         {status === 'done' && (
           <div className="term-line term-line--ok">
-            <span className="term-prompt">›</span>
+            <span className="term-prompt">✓</span>
             Process exited with code 0
           </div>
         )}
         {status === 'failed' && (
           <div className="term-line term-line--err">
-            <span className="term-prompt">›</span>
+            <span className="term-prompt">✗</span>
             Process exited with error
           </div>
         )}
@@ -154,10 +152,89 @@ function TermLog({ lines, status }) {
   )
 }
 
+/* ── Game Launch Modal ───────────────────────────────────────── */
+function GameLaunchModal({ code, filename, onClose }) {
+  const download = () => {
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(new Blob([code], { type: 'text/plain' })),
+      download: filename || 'game.py',
+    })
+    a.click()
+  }
+
+  // Close on overlay click or Escape key
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div className="game-modal-overlay" onClick={onClose}>
+      <div className="game-modal" onClick={e => e.stopPropagation()}>
+        <div className="game-modal-hd">
+          <span className="game-modal-title">How to play your game</span>
+          <button className="drawer-close" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="game-modal-opts">
+          <div className="game-modal-opt">
+            <span className="game-modal-opt-icon">💻</span>
+            <div>
+              <div className="game-modal-opt-title">Run locally</div>
+              <div className="game-modal-opt-desc">
+                Download the file, then in your terminal run:<br />
+                <code>pip install pygame &amp;&amp; python {filename || 'game.py'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="game-modal-opt">
+            <span className="game-modal-opt-icon">🔁</span>
+            <div>
+              <div className="game-modal-opt-title">Run on Replit</div>
+              <div className="game-modal-opt-desc">
+                Open a free Python environment online, paste your code, and click&nbsp;<strong>Run</strong>.
+                Replit supports Pygame via VNC display.
+              </div>
+            </div>
+          </div>
+
+          <div className="game-modal-opt">
+            <span className="game-modal-opt-icon">🌐</span>
+            <div>
+              <div className="game-modal-opt-title">Simple Pygame (Trinket)</div>
+              <div className="game-modal-opt-desc">
+                For beginner-level Pygame scripts, try{' '}
+                <a href="https://trinket.io/pygame" target="_blank" rel="noreferrer">trinket.io/pygame</a>.
+                Paste the code and hit Run.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="game-modal-actions">
+          <button className="game-modal-dl" onClick={download}>
+            ⬇&nbsp; Download {filename || 'game.py'}
+          </button>
+          <a
+            className="game-modal-replit"
+            href="https://replit.com/@replit/Python?v=1"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ▶&nbsp; Open Replit
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── Code viewer ─────────────────────────────────────────────── */
 function CodeViewer({ code, filename, jobId }) {
   const [copied, setCopied] = useState(false)
-  const [playing, setPlaying] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   const copy = () => {
     navigator.clipboard.writeText(code)
@@ -172,43 +249,48 @@ function CodeViewer({ code, filename, jobId }) {
     a.click()
   }
 
-  const play = async () => {
-    setPlaying(true)
-    try { await api.play(jobId) } catch {}
-    setTimeout(() => setPlaying(false), 2500)
-  }
-
   const lines = code.split('\n')
 
   return (
-    <div className="editor">
-      <div className="editor-bar">
-        <div className="editor-tabs">
-          <div className="editor-tab editor-tab--active">
-            <span className="editor-tab-icon">⬡</span>
-            {filename}
+    <>
+      {showModal && (
+        <GameLaunchModal
+          code={code}
+          filename={filename}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+      <div className="editor">
+        <div className="editor-bar">
+          <div className="editor-tabs">
+            <div className="editor-tab editor-tab--active">
+              <span className="editor-tab-icon">⬡</span>
+              {filename}
+            </div>
+          </div>
+          <div className="editor-actions">
+            <button className="e-btn" onClick={copy}>
+              {copied ? '✓ copied' : 'Copy'}
+            </button>
+            <button className="e-btn" onClick={download}>⬇ Download</button>
+            <button
+              className="e-btn e-btn--run"
+              onClick={() => setShowModal(true)}
+            >
+              ▶ Play
+            </button>
           </div>
         </div>
-        <div className="editor-actions">
-          <button className="e-btn" onClick={copy}>
-            {copied ? '✓ copied' : '⎘ copy'}
-          </button>
-          <button className="e-btn" onClick={download}>↓ download</button>
-          <button className={`e-btn e-btn--run ${playing ? 'e-btn--busy' : ''}`}
-                  onClick={play} disabled={playing}>
-            {playing ? '⟳ launching…' : '▶ run'}
-          </button>
+        <div className="editor-body">
+          <div className="editor-gutter">
+            {lines.map((_, i) => (
+              <div key={i} className="editor-ln">{i + 1}</div>
+            ))}
+          </div>
+          <pre className="editor-code"><code>{code}</code></pre>
         </div>
       </div>
-      <div className="editor-body">
-        <div className="editor-gutter">
-          {lines.map((_, i) => (
-            <div key={i} className="editor-ln">{i + 1}</div>
-          ))}
-        </div>
-        <pre className="editor-code"><code>{code}</code></pre>
-      </div>
-    </div>
+    </>
   )
 }
 
@@ -242,7 +324,7 @@ function HistoryDrawer({ onClose, onSelect }) {
         {loading ? (
           <div className="drawer-msg">Loading…</div>
         ) : items.length === 0 ? (
-          <div className="drawer-msg">No runs yet.</div>
+          <div className="drawer-msg">No runs yet — generate your first game.</div>
         ) : (
           <ul className="drawer-list">
             {items.map(it => (
@@ -253,7 +335,7 @@ function HistoryDrawer({ onClose, onSelect }) {
                   <span className={`ditem-status ditem-status--${it.status}`} />
                   <span className="ditem-idea">{it.game_idea || '—'}</span>
                   <button className="ditem-del" onClick={e => remove(e, it.id)}>
-                    {removing === it.id ? '…' : '⌫'}
+                    {removing === it.id ? '…' : '✕'}
                   </button>
                 </div>
                 <div className="ditem-meta">
@@ -273,7 +355,7 @@ function HistoryDrawer({ onClose, onSelect }) {
   )
 }
 
-/* ── Root ────────────────────────────────────────────────────── */
+/* ── App ─────────────────────────────────────────────────────── */
 export default function App() {
   const [idea, setIdea]         = useState('')
   const [outFile, setOutFile]   = useState('game.py')
@@ -308,9 +390,7 @@ export default function App() {
         if (d.status === 'done' || d.status === 'failed') {
           clearInterval(pollRef.current)
           if (d.status === 'done') {
-            if (d.result?.run_id) {
-              setJobId(d.result.run_id)
-            }
+            if (d.result?.run_id) setJobId(d.result.run_id)
             setBurst(true)
             setShowSuccess(true)
             setTimeout(() => setBurst(false), 3200)
@@ -359,7 +439,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── Main ── */}
+      {/* ── Workspace ── */}
       <div className="workspace">
 
         {/* ── Sidebar ── */}
@@ -369,7 +449,7 @@ export default function App() {
             <textarea
               className="sb-ta"
               rows={6}
-              placeholder="Describe your game…"
+              placeholder="Describe your game idea in detail…"
               value={idea}
               onChange={e => setIdea(e.target.value)}
               disabled={isRunning}
@@ -394,13 +474,13 @@ export default function App() {
           >
             {isRunning ? (
               <><span className="run-spin" />Generating</>
-            ) : '⚡ Generate'}
+            ) : 'Generate'}
           </button>
 
           {(similar || simLoading) && (
             <div className="sim-block">
               <div className="sim-hd">
-                similar {simLoading && <span className="run-spin run-spin--sm" />}
+                Similar games {simLoading && <span className="run-spin run-spin--sm" />}
               </div>
               {similar && <pre className="sim-pre">{similar}</pre>}
             </div>
@@ -410,7 +490,7 @@ export default function App() {
         {/* ── Editor pane ── */}
         <main className="editor-pane">
 
-          {/* Success panel */}
+          {/* Success */}
           {showSuccess && isDone && job?.result && (
             <SuccessPanel
               filename={job.result.output_file}
@@ -427,14 +507,14 @@ export default function App() {
 # Describe a game → AI builds it
 
 $ itg generate "Space shooter with bosses"
-  [designer]  writing GDD…
-  [developer] writing pygame code…
-  [qa]        testing and patching…
-  ✓  game.py  (ready to run)`}
+  ↳ designer   writing GDD…
+  ↳ developer  writing pygame code…
+  ↳ qa         testing and patching…
+  ✓ game.py    ready to run`}
                 </pre>
               </div>
               <div className="empty-examples">
-                {['Snake Evolution','WWE Brawler','Tower Defense','Asteroid Blaster'].map(s => (
+                {['Snake Evolution','Space Shooter','Tower Defense','Brick Breaker'].map(s => (
                   <button key={s} className="ex-chip" onClick={() => setIdea(s)}>{s}</button>
                 ))}
               </div>
