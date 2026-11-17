@@ -47,8 +47,8 @@ app.add_middleware(
     allow_headers     = ["*"],
 )
 
-app.include_router(generate_router, tags=["Generation"])
-app.include_router(history_router,  tags=["History"])
+app.include_router(generate_router, prefix="/api", tags=["Generation"])
+app.include_router(history_router,  prefix="/api", tags=["History"])
 
 @app.get("/health", tags=["Health"])
 async def health():
